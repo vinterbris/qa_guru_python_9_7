@@ -4,6 +4,7 @@ from zipfile import ZipFile
 from pypdf import PdfReader
 from openpyxl import load_workbook
 
+
 @pytest.fixture
 def folders():
     if not os.path.exists('resources'):
@@ -36,4 +37,10 @@ def test_pdf(folders, archiving):
 def test_xlsx(folders, archiving):
     with ZipFile('resources/test_archive.zip') as archive:
         file = archive.read('clinics.xlsx')
+        workbook = load_workbook(BytesIO(file))
+        sheet = workbook.active
         assert archive.getinfo('clinics.xlsx').file_size == 11801
+        assert len(workbook.sheetnames) == 1
+        assert sheet.max_row == 63
+        assert sheet.max_column == 4
+        assert sheet.cell(row=62, column=2).value == 'Клиника Эксперт'
