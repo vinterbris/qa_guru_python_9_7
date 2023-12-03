@@ -1,7 +1,7 @@
-import os.path, shutil, pytest
-
-from script_os import TMP_DIR
+import os.path, shutil, pytest, csv
 from zipfile import ZipFile
+from pypdf import PdfReader
+from openpyxl import load_workbook
 
 @pytest.fixture
 def folders():
@@ -10,13 +10,17 @@ def folders():
     if not os.path.exists('tmp'):
         os.mkdir('tmp')
 
-def test_archive(folders):
-    with ZipFile('tmp/test_archive.zip', 'w') as zip_file:
-        zip_file.write('tmp/Storytelling.pdf')
-        zip_file.write('tmp/ubuntu.csv')
-        zip_file.write('tmp/clinics.xlsx')
+@pytest.fixture
+def archiving():
+    if not os.path.exists('resources/test_archive.zip'):
+        shutil.make_archive('test_archive', 'zip', 'tmp')
+        shutil.move('test_archive.zip', 'resources/test_archive.zip')
 
-    shutil.move('tmp/test_archive.zip', 'resources/test_archive.zip')
 
-    with ZipFile('resources/test_archive.zip'):
-        zip_file.
+def test_csv(folders, archiving):
+    with ZipFile('resources/test_archive.zip') as zip_file:
+        file = zip_file.read('ubuntu.csv')
+
+def test_pdf(folders, archiving):
+    with ZipFile('resources/test_archive.zip') as zip_file:
+        file = zip_file.read('Storytelling.pdf')
