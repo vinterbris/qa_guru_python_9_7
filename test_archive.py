@@ -19,8 +19,9 @@ def archiving():
 
 
 def test_csv(folders, archiving):
-    with ZipFile('resources/test_archive.zip') as zip_file:
-        file = zip_file.read('ubuntu.csv')
+    with ZipFile('resources/test_archive.zip') as archive:
+        file = archive.read('ubuntu.csv')
+        assert archive.getinfo('ubuntu.csv').file_size == 2583
 
 
 def test_pdf(folders, archiving):
@@ -31,3 +32,8 @@ def test_pdf(folders, archiving):
         assert len(reader.pages) == 1
         assert "I tried to kiss a girl and head butt her instead" in reader.pages[0].extract_text()
 
+
+def test_xlsx(folders, archiving):
+    with ZipFile('resources/test_archive.zip') as archive:
+        file = archive.read('clinics.xlsx')
+        assert archive.getinfo('clinics.xlsx').file_size == 11801
