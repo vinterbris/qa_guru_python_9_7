@@ -1,8 +1,9 @@
-import os.path, shutil, pytest, csv
+import os.path, shutil, pytest
 from io import BytesIO
 from zipfile import ZipFile
 from pypdf import PdfReader
 from openpyxl import load_workbook
+from pandas import read_csv
 
 
 @pytest.fixture
@@ -22,7 +23,11 @@ def archiving():
 def test_csv(folders, archiving):
     with ZipFile('resources/test_archive.zip') as archive:
         file = archive.read('ubuntu.csv')
+        data_frame = read_csv(BytesIO(file))
         assert archive.getinfo('ubuntu.csv').file_size == 2583
+        assert len(data_frame.axes[0]) == 39
+        assert len(data_frame.axes[1]) == 8
+        assert data_frame.loc[28, 'codename'] == 'Cosmic Cuttlefish'
 
 
 def test_pdf(folders, archiving):
