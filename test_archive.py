@@ -1,4 +1,5 @@
 import os.path, shutil, pytest, csv
+from io import BytesIO
 from zipfile import ZipFile
 from pypdf import PdfReader
 from openpyxl import load_workbook
@@ -21,6 +22,12 @@ def test_csv(folders, archiving):
     with ZipFile('resources/test_archive.zip') as zip_file:
         file = zip_file.read('ubuntu.csv')
 
+
 def test_pdf(folders, archiving):
-    with ZipFile('resources/test_archive.zip') as zip_file:
-        file = zip_file.read('Storytelling.pdf')
+    with ZipFile('resources/test_archive.zip') as archive:
+        file = archive.read('Storytelling.pdf')
+        reader = PdfReader(BytesIO(file))
+        assert archive.getinfo('Storytelling.pdf').file_size == 40365
+        assert len(reader.pages) == 1
+        assert "I tried to kiss a girl and head butt her instead" in reader.pages[0].extract_text()
+
